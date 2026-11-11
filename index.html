@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameRater</title>
+    <!-- Futuristic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,19 +14,19 @@
 <nav class="navbar">
     <h2 id="logo">GameRater</h2>
     <div class="nav-right">
-        <span id="user-name-display" style="display: none; margin-right: 15px; color: var(--primary); font-weight: bold;"></span>
-        <button id="nav-settings-btn" style="display: none;">Settings</button>
-        <button id="login-btn-nav">Log In</button>
+        <span id="user-name-display" style="display: none; margin-right: 15px; color: var(--primary); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;"></span>
+        <button id="nav-settings-btn" class="nav-btn" style="display: none;">Settings</button>
+        <button id="login-btn-nav" class="nav-btn">Log In</button>
     </div>
 </nav>
 
 <div class="container">
     
     <!-- VIEW 1: Home / Feed -->
-    <div id="view-home">
-        <div class="form-card" id="rate-prompt-card" style="display: none; text-align: center;">
+    <div id="view-home" class="view-section">
+        <div class="form-card pulse-card" id="rate-prompt-card" style="display: none; text-align: center;">
             <h3 style="margin-top: 0;">Played a game recently?</h3>
-            <button id="go-to-rate-btn">Rate a Game</button>
+            <button id="go-to-rate-btn" class="glow-btn">Rate a Game</button>
         </div>
         
         <div id="reviews-container">
@@ -33,12 +35,11 @@
     </div>
 
     <!-- VIEW 2: Rate a Game Form -->
-    <div id="view-rate" style="display: none;">
-        <div class="form-card">
+    <div id="view-rate" class="view-section" style="display: none;">
+        <div class="form-card glass-card">
             <h2>Rate a Game</h2>
             <form id="review-form">
                 
-                <!-- Native Searchable Dropdown linking to games.json -->
                 <input type="text" id="game-name" list="game-options" placeholder="Search for a game... (e.g., Elden Ring)" required autocomplete="off">
                 <datalist id="game-options">
                     <!-- Populated automatically by app.js -->
@@ -56,32 +57,33 @@
                 
                 <label class="checkbox-label">
                     <input type="checkbox" id="post-anonymous">
+                    <span class="custom-checkbox"></span>
                     Post Anonymously
                 </label>
 
-                <button type="submit">Submit Review</button>
+                <button type="submit" class="glow-btn">Submit Review</button>
                 <button type="button" id="back-to-home-btn" class="secondary-btn">Cancel & Go Back</button>
             </form>
         </div>
     </div>
 
     <!-- VIEW 3: Settings -->
-    <div id="view-settings" style="display: none;">
-        <div class="form-card" style="text-align: center;">
+    <div id="view-settings" class="view-section" style="display: none;">
+        <div class="form-card glass-card" style="text-align: center;">
             <h2 style="margin-top: 0;">Settings</h2>
             
             <h3 style="margin-top: 20px; color: var(--text);">UI Theme</h3>
             <div class="theme-buttons">
-                <button class="theme-btn" data-theme="default">Purple (Default)</button>
-                <button class="theme-btn" data-theme="green">Matrix Green</button>
-                <button class="theme-btn" data-theme="bw">High Contrast (B&W)</button>
+                <button class="theme-btn secondary-btn" data-theme="default">Nebula Purple (Default)</button>
+                <button class="theme-btn secondary-btn" data-theme="green">Matrix Green</button>
+                <button class="theme-btn secondary-btn" data-theme="bw">Stealth Black</button>
             </div>
 
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <button id="logout-btn-settings" class="delete-btn" style="width: 100%;">Log Out</button>
             </div>
 
-            <p class="credits" style="margin-top: 30px; font-weight: bold; color: var(--primary);">Made By Moath Al-Turk</p>
+            <p class="credits" style="margin-top: 30px; font-weight: bold; color: var(--primary); letter-spacing: 2px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px var(--primary);">Made By Moath Al-Turk</p>
             <button type="button" id="settings-back-btn" class="secondary-btn" style="margin-top: 15px;">Back to Feed</button>
         </div>
     </div>
