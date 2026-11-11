@@ -5,12 +5,12 @@ import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/1
 
 // 🔴 REPLACE THIS WITH YOUR FIREBASE WEB APP CONFIG 🔴
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB9Z5WUXRf4KdYostUH4x4r0bgAX0XuixY",
+  authDomain: "gamerater-a6108.firebaseapp.com",
+  projectId: "gamerater-a6108",
+  storageBucket: "gamerater-a6108.firebasestorage.app",
+  messagingSenderId: "1088131185322",
+  appId: "1:1088131185322:web:401af0aa65614a91aa6ed3"
 };
 
 const app = initializeApp(firebaseConfig);
