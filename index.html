@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameRater</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>GameRater</h1>
+    
+    <div class="form-card">
+        <h2>Rate a Game</h2>
+        <form id="review-form">
+            <input type="text" id="game-name" placeholder="Game Title (e.g., Elden Ring, Valorant)" required>
+            <select id="game-rating" required>
+                <option value="" disabled selected>Select Rating</option>
+                <option value="5">5 - Masterpiece</option>
+                <option value="4">4 - Great</option>
+                <option value="3">3 - Good</option>
+                <option value="2">2 - Mediocre</option>
+                <option value="1">1 - Terrible</option>
+            </select>
+            <textarea id="game-review" rows="4" placeholder="Write your review here..." required></textarea>
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <div id="reviews-container">
+        <!-- Live reviews will render here -->
+    </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
