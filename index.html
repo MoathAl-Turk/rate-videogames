@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <!-- Review Form (Hidden by default for guests) -->
+    <!-- Review Form -->
     <div class="form-card" id="form-container" style="display: none;">
         <h2>Rate a Game</h2>
         <form id="review-form">
@@ -34,6 +34,12 @@
                 <option value="1">1 - Terrible</option>
             </select>
             <textarea id="game-review" rows="4" placeholder="Write your review here..." required></textarea>
+            
+            <label class="checkbox-label">
+                <input type="checkbox" id="post-anonymous">
+                Post Anonymously
+            </label>
+
             <button type="submit">Submit Review</button>
         </form>
     </div>
