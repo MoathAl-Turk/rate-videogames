@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- Top Navigation Bar -->
 <nav class="navbar">
     <h2 id="logo">GameRater</h2>
     <div class="nav-right">
@@ -22,15 +21,12 @@
     
     <!-- VIEW 1: Home / Feed -->
     <div id="view-home">
-        <!-- Box in middle to go rate a game (Hidden if not logged in) -->
         <div class="form-card" id="rate-prompt-card" style="display: none; text-align: center;">
             <h3 style="margin-top: 0;">Played a game recently?</h3>
             <button id="go-to-rate-btn">Rate a Game</button>
         </div>
         
-        <div id="reviews-container">
-            <!-- Live reviews will render here -->
-        </div>
+        <div id="reviews-container"></div>
     </div>
 
     <!-- VIEW 2: Rate a Game Form -->
@@ -38,7 +34,12 @@
         <div class="form-card">
             <h2>Rate a Game</h2>
             <form id="review-form">
-                <input type="text" id="game-name" placeholder="Game Title (e.g., Elden Ring, Valorant)" required>
+                
+                <div class="autocomplete-wrapper" style="position: relative;">
+                    <input type="text" id="game-name" placeholder="Search for a game... (e.g., Elden Ring)" required autocomplete="off">
+                    <div id="autocomplete-list" class="autocomplete-items"></div>
+                </div>
+
                 <select id="game-rating" required>
                     <option value="" disabled selected>Select Rating</option>
                     <option value="5">5 - Masterpiece</option>
@@ -65,7 +66,12 @@
         <div class="form-card" style="text-align: center;">
             <h2 style="margin-top: 0;">Settings</h2>
             
-            <h3 style="margin-top: 20px; color: var(--text);">UI Theme</h3>
+            <h3 style="margin-top: 20px; color: var(--text);">OpenRouter API Key</h3>
+            <p style="font-size: 0.85rem; color: #888;">Stored securely in your browser's local storage.</p>
+            <input type="password" id="api-key-input" placeholder="sk-or-v1-..." style="text-align: center;">
+            <button id="save-key-btn" class="secondary-btn" style="margin-bottom: 20px;">Save Key</button>
+
+            <h3 style="margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; color: var(--text);">UI Theme</h3>
             <div class="theme-buttons">
                 <button class="theme-btn" data-theme="default">Purple (Default)</button>
                 <button class="theme-btn" data-theme="green">Matrix Green</button>
