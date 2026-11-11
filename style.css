@@ -24,12 +24,18 @@ h1 {
     font-size: 2.5rem;
     margin-bottom: 30px;
 }
-.form-card, .review-card {
+.form-card, .review-card, .auth-card {
     background-color: var(--surface);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.auth-card {
+    text-align: center;
+}
+#user-info p {
+    margin: 0 0 15px 0;
 }
 input, select, textarea, button {
     width: 100%;
@@ -55,8 +61,13 @@ button:hover {
     background-color: #9965f4;
 }
 .review-card h3 {
-    margin: 0 0 10px 0;
+    margin: 0 0 5px 0;
     color: var(--primary);
+}
+.reviewer-name {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
 }
 .rating {
     color: #ffd700;
