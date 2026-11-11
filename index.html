@@ -11,7 +11,17 @@
 <div class="container">
     <h1>GameRater</h1>
     
-    <div class="form-card">
+    <!-- Auth Section -->
+    <div class="auth-card" id="auth-section">
+        <button id="login-btn">Log in with Google to Rate Games</button>
+        <div id="user-info" style="display: none;">
+            <p>Logged in as: <span id="user-name-display" style="color: var(--primary); font-weight: bold;"></span></p>
+            <button id="logout-btn" style="background-color: #ff5252;">Log Out</button>
+        </div>
+    </div>
+
+    <!-- Review Form (Hidden by default for guests) -->
+    <div class="form-card" id="form-container" style="display: none;">
         <h2>Rate a Game</h2>
         <form id="review-form">
             <input type="text" id="game-name" placeholder="Game Title (e.g., Elden Ring, Valorant)" required>
