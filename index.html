@@ -8,45 +8,79 @@
 </head>
 <body>
 
+<!-- Top Navigation Bar -->
+<nav class="navbar">
+    <h2 id="logo">GameRater</h2>
+    <div class="nav-right">
+        <span id="user-name-display" style="display: none; margin-right: 15px; color: var(--primary); font-weight: bold;"></span>
+        <button id="nav-settings-btn" style="display: none;">Settings</button>
+        <button id="login-btn-nav">Log In</button>
+    </div>
+</nav>
+
 <div class="container">
-    <h1>GameRater</h1>
     
-    <!-- Auth Section -->
-    <div class="auth-card" id="auth-section">
-        <button id="login-btn">Log in with Google to Rate Games</button>
-        <div id="user-info" style="display: none;">
-            <p>Logged in as: <span id="user-name-display" style="color: var(--primary); font-weight: bold;"></span></p>
-            <button id="logout-btn" style="background-color: #ff5252;">Log Out</button>
+    <!-- VIEW 1: Home / Feed -->
+    <div id="view-home">
+        <!-- Box in middle to go rate a game (Hidden if not logged in) -->
+        <div class="form-card" id="rate-prompt-card" style="display: none; text-align: center;">
+            <h3 style="margin-top: 0;">Played a game recently?</h3>
+            <button id="go-to-rate-btn">Rate a Game</button>
+        </div>
+        
+        <div id="reviews-container">
+            <!-- Live reviews will render here -->
         </div>
     </div>
 
-    <!-- Review Form -->
-    <div class="form-card" id="form-container" style="display: none;">
-        <h2>Rate a Game</h2>
-        <form id="review-form">
-            <input type="text" id="game-name" placeholder="Game Title (e.g., Elden Ring, Valorant)" required>
-            <select id="game-rating" required>
-                <option value="" disabled selected>Select Rating</option>
-                <option value="5">5 - Masterpiece</option>
-                <option value="4">4 - Great</option>
-                <option value="3">3 - Good</option>
-                <option value="2">2 - Mediocre</option>
-                <option value="1">1 - Terrible</option>
-            </select>
-            <textarea id="game-review" rows="4" placeholder="Write your review here..." required></textarea>
+    <!-- VIEW 2: Rate a Game Form -->
+    <div id="view-rate" style="display: none;">
+        <div class="form-card">
+            <h2>Rate a Game</h2>
+            <form id="review-form">
+                <input type="text" id="game-name" placeholder="Game Title (e.g., Elden Ring, Valorant)" required>
+                <select id="game-rating" required>
+                    <option value="" disabled selected>Select Rating</option>
+                    <option value="5">5 - Masterpiece</option>
+                    <option value="4">4 - Great</option>
+                    <option value="3">3 - Good</option>
+                    <option value="2">2 - Mediocre</option>
+                    <option value="1">1 - Terrible</option>
+                </select>
+                <textarea id="game-review" rows="4" placeholder="Write your review here..." required></textarea>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" id="post-anonymous">
+                    Post Anonymously
+                </label>
+
+                <button type="submit">Submit Review</button>
+                <button type="button" id="back-to-home-btn" class="secondary-btn">Cancel & Go Back</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- VIEW 3: Settings -->
+    <div id="view-settings" style="display: none;">
+        <div class="form-card" style="text-align: center;">
+            <h2 style="margin-top: 0;">Settings</h2>
             
-            <label class="checkbox-label">
-                <input type="checkbox" id="post-anonymous">
-                Post Anonymously
-            </label>
+            <h3 style="margin-top: 20px; color: var(--text);">UI Theme</h3>
+            <div class="theme-buttons">
+                <button class="theme-btn" data-theme="default">Purple (Default)</button>
+                <button class="theme-btn" data-theme="green">Matrix Green</button>
+                <button class="theme-btn" data-theme="bw">High Contrast (B&W)</button>
+            </div>
 
-            <button type="submit">Submit Review</button>
-        </form>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                <button id="logout-btn-settings" class="delete-btn" style="width: 100%;">Log Out</button>
+            </div>
+
+            <p class="credits" style="margin-top: 30px; font-weight: bold; color: var(--primary);">Made By Moath Al-Turk</p>
+            <button type="button" id="settings-back-btn" class="secondary-btn" style="margin-top: 15px;">Back to Feed</button>
+        </div>
     </div>
 
-    <div id="reviews-container">
-        <!-- Live reviews will render here -->
-    </div>
 </div>
 
 <script type="module" src="app.js"></script>
