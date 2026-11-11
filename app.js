@@ -94,7 +94,22 @@ themeButtons.forEach(btn => {
         document.body.className = theme === 'default' ? '' : `theme-${theme}`;
     });
 });
+const toggleMotionCheckbox = document.getElementById('toggle-motion');
+const isMotionEnabled = localStorage.getItem('motionEnabled') !== 'false';
+toggleMotionCheckbox.checked = isMotionEnabled;
+if (!isMotionEnabled) {
+    document.body.classList.add('motion-off');
+}
 
+toggleMotionCheckbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        document.body.classList.remove('motion-off');
+        localStorage.setItem('motionEnabled', 'true');
+    } else {
+        document.body.classList.add('motion-off');
+        localStorage.setItem('motionEnabled', 'false');
+    }
+});
 // ==========================================
 // AUTHENTICATION
 // ==========================================
