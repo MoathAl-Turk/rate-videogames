@@ -4,7 +4,8 @@
     --bg-3: #24243e;
     --primary: #bb86fc; 
     --primary-glow: rgba(187, 134, 252, 0.6);
-    --grid-color: rgba(187, 134, 252, 0.1);
+    /* Increased grid opacity from 0.1 to 0.25 to make it highly visible */
+    --grid-color: rgba(187, 134, 252, 0.25);
     --text: #e0e0e0;
     --card-bg: rgba(30, 30, 46, 0.5);
 }
@@ -12,13 +13,13 @@
 body.theme-green { 
     --primary: #03dac6; 
     --primary-glow: rgba(3, 218, 198, 0.6);
-    --grid-color: rgba(3, 218, 198, 0.15);
+    --grid-color: rgba(3, 218, 198, 0.25);
     --bg-1: #000000; --bg-2: #0f380f; --bg-3: #000000; 
 }
 body.theme-bw { 
     --primary: #ffffff; 
     --primary-glow: rgba(255, 255, 255, 0.4);
-    --grid-color: rgba(255, 255, 255, 0.1);
+    --grid-color: rgba(255, 255, 255, 0.15);
     --bg-1: #0a0a0a; --bg-2: #1a1a1a; --bg-3: #050505; 
     --card-bg: rgba(15, 15, 15, 0.7);
 }
@@ -40,20 +41,21 @@ body {
     overflow-x: hidden;
 }
 
-/* Rocket League 20XX Grid Animation */
+/* Rocket League 20XX Grid Animation - FIXED TO FILL SCREEN */
 .bg-grid {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: -50%;
+    left: -50%;
     width: 200%;
     height: 200%;
     background-image: 
         linear-gradient(var(--grid-color) 2px, transparent 2px),
         linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
-    background-size: 40px 40px;
+    background-size: 60px 60px;
     z-index: -1;
-    transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-    animation: gridScroll 10s linear infinite;
+    /* Angled to mimic the 20XX sweeping motion */
+    transform: rotate(25deg); 
+    animation: gridScroll 3s linear infinite;
     pointer-events: none;
 }
 
@@ -62,18 +64,20 @@ body {
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+
 @keyframes gridScroll {
-    0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
-    100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); }
+    /* Animating the background position creates an endless sweeping loop */
+    0% { background-position: 0px 0px; }
+    100% { background-position: 60px 60px; }
 }
 
-/* Accessibility: Pause Animations */
+/* Accessibility: Pause Animations when toggled off in Settings */
 body.motion-off {
     animation: none !important;
     background-position: 0% 50% !important;
 }
 body.motion-off .bg-grid {
-    animation: none !important;
+    display: none; /* Completely hides the grid when motion is turned off */
 }
 
 /* Page Transition Animations */
