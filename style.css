@@ -27,7 +27,6 @@ body {
     min-height: 100vh;
 }
 
-/* Top Navigation Bar */
 .navbar {
     width: 100%;
     background-color: var(--surface);
