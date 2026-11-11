@@ -8,6 +8,7 @@
 </head>
 <body>
 
+<!-- Top Navigation Bar -->
 <nav class="navbar">
     <h2 id="logo">GameRater</h2>
     <div class="nav-right">
@@ -26,7 +27,9 @@
             <button id="go-to-rate-btn">Rate a Game</button>
         </div>
         
-        <div id="reviews-container"></div>
+        <div id="reviews-container">
+            <!-- Live reviews will render here -->
+        </div>
     </div>
 
     <!-- VIEW 2: Rate a Game Form -->
@@ -35,10 +38,11 @@
             <h2>Rate a Game</h2>
             <form id="review-form">
                 
-                <div class="autocomplete-wrapper" style="position: relative;">
-                    <input type="text" id="game-name" placeholder="Search for a game... (e.g., Elden Ring)" required autocomplete="off">
-                    <div id="autocomplete-list" class="autocomplete-items"></div>
-                </div>
+                <!-- Native Searchable Dropdown linking to games.json -->
+                <input type="text" id="game-name" list="game-options" placeholder="Search for a game... (e.g., Elden Ring)" required autocomplete="off">
+                <datalist id="game-options">
+                    <!-- Populated automatically by app.js -->
+                </datalist>
 
                 <select id="game-rating" required>
                     <option value="" disabled selected>Select Rating</option>
@@ -66,12 +70,7 @@
         <div class="form-card" style="text-align: center;">
             <h2 style="margin-top: 0;">Settings</h2>
             
-            <h3 style="margin-top: 20px; color: var(--text);">OpenRouter API Key</h3>
-            <p style="font-size: 0.85rem; color: #888;">Stored securely in your browser's local storage.</p>
-            <input type="password" id="api-key-input" placeholder="sk-or-v1-..." style="text-align: center;">
-            <button id="save-key-btn" class="secondary-btn" style="margin-bottom: 20px;">Save Key</button>
-
-            <h3 style="margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; color: var(--text);">UI Theme</h3>
+            <h3 style="margin-top: 20px; color: var(--text);">UI Theme</h3>
             <div class="theme-buttons">
                 <button class="theme-btn" data-theme="default">Purple (Default)</button>
                 <button class="theme-btn" data-theme="green">Matrix Green</button>
