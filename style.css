@@ -193,3 +193,26 @@ input:focus, select:focus, textarea:focus {
 }
 .comment:hover { background: rgba(0,0,0,0.4); }
 .comment-author { color: var(--primary); font-weight: bold; margin-right: 5px; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; }
+/* Admin Queue Buttons */
+.approve-btn { 
+    background-color: rgba(46, 213, 115, 0.2); 
+    color: #2ed573; 
+    border: 1px solid #2ed573; 
+    margin-top: 15px; 
+    font-size: 0.9rem; 
+    padding: 8px;
+    width: 48%;
+    display: inline-block;
+}
+.approve-btn:hover { 
+    background-color: #2ed573; 
+    color: #fff; 
+    box-shadow: 0 0 15px rgba(46, 213, 115, 0.6); 
+}
+.admin-actions {
+    display: flex;
+    justify-content: space-between;
+}
+.admin-actions .delete-btn {
+    width: 48%;
+}
