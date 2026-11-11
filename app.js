@@ -16,6 +16,9 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// Your Admin Email
+const ADMIN_EMAIL = "moathalturk88@gmail.com";
+
 // DOM Elements
 const loginBtnNav = document.getElementById('login-btn-nav');
 const navSettingsBtn = document.getElementById('nav-settings-btn');
@@ -23,12 +26,10 @@ const userNameDisplay = document.getElementById('user-name-display');
 const logoutBtnSettings = document.getElementById('logout-btn-settings');
 const logo = document.getElementById('logo');
 
-// Views
 const viewHome = document.getElementById('view-home');
 const viewRate = document.getElementById('view-rate');
 const viewSettings = document.getElementById('view-settings');
 
-// View Buttons
 const ratePromptCard = document.getElementById('rate-prompt-card');
 const goToRateBtn = document.getElementById('go-to-rate-btn');
 const backToHomeBtn = document.getElementById('back-to-home-btn');
@@ -38,7 +39,6 @@ const reviewsContainer = document.getElementById('reviews-container');
 
 let currentUser = null;
 
-// Routing logic: Hide all views, then show the requested one
 function showView(viewId) {
     viewHome.style.display = 'none';
     viewRate.style.display = 'none';
@@ -46,37 +46,28 @@ function showView(viewId) {
     document.getElementById(viewId).style.display = 'block';
 }
 
-// Navigation Event Listeners
 goToRateBtn.addEventListener('click', () => showView('view-rate'));
 backToHomeBtn.addEventListener('click', () => showView('view-home'));
 navSettingsBtn.addEventListener('click', () => showView('view-settings'));
 settingsBackBtn.addEventListener('click', () => showView('view-home'));
-logo.addEventListener('click', () => showView('view-home')); // Clicking logo returns home
+logo.addEventListener('click', () => showView('view-home'));
 
-// Theme Switcher Logic
 const themeButtons = document.querySelectorAll('.theme-btn');
 themeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
         const theme = e.target.getAttribute('data-theme');
-        if (theme === 'default') {
-            document.body.className = '';
-        } else {
-            document.body.className = `theme-${theme}`;
-        }
+        document.body.className = theme === 'default' ? '' : `theme-${theme}`;
     });
 });
 
-// Auth State Changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
-        // Update Navbar
         loginBtnNav.style.display = 'none';
         userNameDisplay.style.display = 'inline';
-        userNameDisplay.textContent = user.displayName;
+        // Add an [ADMIN] tag next to your name visually
+        userNameDisplay.textContent = user.email === ADMIN_EMAIL ? `👑 ${user.displayName} (Admin)` : user.displayName;
         navSettingsBtn.style.display = 'inline-block';
-        
-        // Show the prompt box on the home feed
         ratePromptCard.style.display = 'block';
     } else {
         currentUser = null;
@@ -84,8 +75,6 @@ onAuthStateChanged(auth, (user) => {
         userNameDisplay.style.display = 'none';
         navSettingsBtn.style.display = 'none';
         ratePromptCard.style.display = 'none';
-        
-        // Return to home if logged out
         showView('view-home');
     }
 });
@@ -93,7 +82,7 @@ onAuthStateChanged(auth, (user) => {
 loginBtnNav.addEventListener('click', () => signInWithPopup(auth, provider));
 logoutBtnSettings.addEventListener('click', () => signOut(auth));
 
-// Handle New Review Submission
+// Handle New Review
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -117,7 +106,6 @@ form.addEventListener('submit', async (e) => {
             timestamp: serverTimestamp()
         });
         form.reset();
-        // Automatically redirect back to the home feed to see the post
         showView('view-home');
     } catch (error) {
         console.error("Error adding document: ", error);
@@ -143,6 +131,7 @@ document.addEventListener('submit', async (e) => {
             await addDoc(collection(db, "reviews", reviewId, "comments"), {
                 text: commentText,
                 author: currentUser.displayName,
+                authorId: currentUser.uid, // Save ID so it can be deleted
                 timestamp: serverTimestamp()
             });
             input.value = '';
@@ -154,7 +143,18 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// Render Reviews and Comments
+// Handle Global Comment Deletion (Event Delegation)
+document.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('delete-comment-btn')) {
+        if (confirm("Delete this comment?")) {
+            const reviewId = e.target.getAttribute('data-review-id');
+            const commentId = e.target.getAttribute('data-comment-id');
+            await deleteDoc(doc(db, "reviews", reviewId, "comments", commentId));
+        }
+    }
+});
+
+// Render Reviews
 const q = query(collection(db, "reviews"), orderBy("timestamp", "desc"));
 onSnapshot(q, (snapshot) => {
     reviewsContainer.innerHTML = '';
@@ -172,10 +172,11 @@ onSnapshot(q, (snapshot) => {
             <p>${data.review}</p>
         `;
 
-        if (currentUser && currentUser.uid === data.reviewerId) {
+        // SHOW DELETE BUTTON IF: User owns the review OR User is Admin
+        if (currentUser && (currentUser.uid === data.reviewerId || currentUser.email === ADMIN_EMAIL)) {
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
-            delBtn.textContent = 'Delete My Review';
+            delBtn.textContent = currentUser.email === ADMIN_EMAIL && currentUser.uid !== data.reviewerId ? 'Admin: Delete Review' : 'Delete My Review';
             delBtn.onclick = async () => {
                 if(confirm("Are you sure you want to delete this review?")) {
                     await deleteDoc(doc(db, "reviews", id));
@@ -207,6 +208,7 @@ onSnapshot(q, (snapshot) => {
         card.appendChild(commentsDiv);
         reviewsContainer.appendChild(card);
 
+        // Fetch Comments
         const commentsQuery = query(collection(db, "reviews", id, "comments"), orderBy("timestamp", "asc"));
         onSnapshot(commentsQuery, (commentSnap) => {
             const listElement = document.getElementById(`comments-list-${id}`);
@@ -220,9 +222,17 @@ onSnapshot(q, (snapshot) => {
             
             commentSnap.forEach((cDoc) => {
                 const cData = cDoc.data();
+                
+                // Show delete button for comments if author or Admin
+                let deleteHTML = '';
+                if (currentUser && (currentUser.uid === cData.authorId || currentUser.email === ADMIN_EMAIL)) {
+                    deleteHTML = `<button class="delete-comment-btn" data-review-id="${id}" data-comment-id="${cDoc.id}" style="background: none; color: #ff5252; border: none; font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px; width: auto; font-weight: normal;">[Delete]</button>`;
+                }
+
                 listElement.innerHTML += `
-                    <div class="comment">
-                        <span class="comment-author">${cData.author}:</span> ${cData.text}
+                    <div class="comment" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div><span class="comment-author">${cData.author}:</span> ${cData.text}</div>
+                        ${deleteHTML}
                     </div>
                 `;
             });
