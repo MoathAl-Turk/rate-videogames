@@ -16,7 +16,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 🔴 2. YOUR ADMIN EMAIL 🔴
+// 🔴 YOUR ADMIN EMAIL 🔴
 const ADMIN_EMAIL = "moathalturk88@gmail.com";
 
 // DOM Elements
@@ -37,23 +37,29 @@ const settingsBackBtn = document.getElementById('settings-back-btn');
 const form = document.getElementById('review-form');
 const reviewsContainer = document.getElementById('reviews-container');
 
-// OpenRouter Local Storage Logic
-const apiKeyInput = document.getElementById('api-key-input');
-const saveKeyBtn = document.getElementById('save-key-btn');
-apiKeyInput.value = localStorage.getItem('openRouterApiKey') || '';
-
-saveKeyBtn.addEventListener('click', () => {
-    localStorage.setItem('openRouterApiKey', apiKeyInput.value.trim());
-    alert("API Key saved to your browser!");
-});
-
-// Autocomplete Elements
-const gameNameInput = document.getElementById('game-name');
-const autocompleteList = document.getElementById('autocomplete-list');
-let isValidGameSelected = false; 
-let debounceTimer;
 let currentUser = null;
+let validGamesList = []; // Array to hold all 11,000+ games
 
+// ==========================================
+// FETCH DATASET AND POPULATE DATALIST
+// ==========================================
+fetch('games.json')
+    .then(response => response.json())
+    .then(games => {
+        validGamesList = games;
+        const datalist = document.getElementById('game-options');
+        
+        // Add each game as an option to the searchable dropdown
+        games.forEach(game => {
+            const option = document.createElement('option');
+            option.value = game;
+            datalist.appendChild(option);
+        });
+    })
+    .catch(err => console.error("Error loading games.json:", err));
+
+
+// Routing logic
 function showView(viewId) {
     viewHome.style.display = 'none';
     viewRate.style.display = 'none';
@@ -67,6 +73,7 @@ navSettingsBtn.addEventListener('click', () => showView('view-settings'));
 settingsBackBtn.addEventListener('click', () => showView('view-home'));
 logo.addEventListener('click', () => showView('view-home'));
 
+// Theme Switcher Logic
 const themeButtons = document.querySelectorAll('.theme-btn');
 themeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -75,12 +82,16 @@ themeButtons.forEach(btn => {
     });
 });
 
+// Auth State Changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
         loginBtnNav.style.display = 'none';
         userNameDisplay.style.display = 'inline';
+        
+        // Admin crown check
         userNameDisplay.textContent = user.email === ADMIN_EMAIL ? `👑 ${user.displayName} (Admin)` : user.displayName;
+        
         navSettingsBtn.style.display = 'inline-block';
         ratePromptCard.style.display = 'block';
     } else {
@@ -97,100 +108,21 @@ loginBtnNav.addEventListener('click', () => signInWithPopup(auth, provider));
 logoutBtnSettings.addEventListener('click', () => signOut(auth));
 
 // ==========================================
-// OPENROUTER API AUTOCOMPLETE LOGIC
-// ==========================================
-gameNameInput.addEventListener('input', function() {
-    clearTimeout(debounceTimer);
-    isValidGameSelected = false; 
-    const queryStr = this.value.trim();
-    const apiKey = localStorage.getItem('openRouterApiKey');
-    
-    if (!queryStr) {
-        autocompleteList.innerHTML = '';
-        return;
-    }
-
-    if (!apiKey) {
-        autocompleteList.innerHTML = '<div style="color: #ff5252; padding: 10px;">Missing API Key. Go to Settings.</div>';
-        return;
-    }
-
-    // Wait 800ms to avoid spamming the AI API while typing
-    debounceTimer = setTimeout(async () => {
-        autocompleteList.innerHTML = '<div style="color: #888; padding: 10px;">Verifying game title...</div>';
-        
-        try {
-            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    // Using a fast, free model for verification
-                    model: "meta-llama/llama-3.1-8b-instruct:free", 
-                    messages: [
-                        {
-                            role: "system",
-                            content: "You are a video game database. The user gives a query. Return a JSON array of up to 3 real games matching the query. Format: [{\"name\": \"Game Title\", \"year\": \"YYYY\"}]. If gibberish, return []. ONLY output valid JSON."
-                        },
-                        { role: "user", content: queryStr }
-                    ]
-                })
-            });
-            
-            const data = await res.json();
-            let aiText = data.choices[0].message.content;
-            
-            // Clean up any markdown formatting the AI might add
-            aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
-            const games = JSON.parse(aiText);
-            
-            autocompleteList.innerHTML = ''; 
-            
-            if (!Array.isArray(games) || games.length === 0) {
-                autocompleteList.innerHTML = '<div style="color: #ff5252;">Not recognized as a real game.</div>';
-                return;
-            }
-
-            games.forEach(game => {
-                const item = document.createElement('div');
-                item.innerHTML = `<strong>${game.name}</strong> <span class="autocomplete-year">${game.year}</span>`;
-                
-                item.addEventListener('click', () => {
-                    gameNameInput.value = game.name;
-                    isValidGameSelected = true; 
-                    autocompleteList.innerHTML = ''; 
-                });
-                
-                autocompleteList.appendChild(item);
-            });
-        } catch (err) {
-            console.error("OpenRouter API Error:", err);
-            autocompleteList.innerHTML = '<div style="color: #ff5252; padding: 10px;">API Error. Check console.</div>';
-        }
-    }, 800);
-});
-
-document.addEventListener('click', function(e) {
-    if (e.target !== gameNameInput) {
-        autocompleteList.innerHTML = '';
-    }
-});
-
-// ==========================================
 // SUBMIT REVIEW
 // ==========================================
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return;
     
-    if (!isValidGameSelected) {
-        alert("Please search and select a valid game from the dropdown list!");
+    const gameNameInput = document.getElementById('game-name');
+    const name = gameNameInput.value.trim();
+    
+    // Strict Validation: Ensure the typed/selected name matches the games.json list
+    if (!validGamesList.includes(name)) {
+        alert("Please select a valid game from the dropdown list!");
         return;
     }
-    
-    const name = gameNameInput.value;
+
     const rating = document.getElementById('game-rating').value;
     const review = document.getElementById('game-review').value;
     const isAnonymous = document.getElementById('post-anonymous').checked;
@@ -209,17 +141,19 @@ form.addEventListener('submit', async (e) => {
             timestamp: serverTimestamp()
         });
         form.reset();
-        isValidGameSelected = false; 
         showView('view-home');
     } catch (error) {
         console.error("Error adding document: ", error);
+        alert("Error posting review.");
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Review';
     }
 });
 
-// Handle Comment Submissions
+// ==========================================
+// HANDLE COMMENT SUBMISSIONS
+// ==========================================
 document.addEventListener('submit', async (e) => {
     if (e.target.classList.contains('comment-form')) {
         e.preventDefault();
@@ -247,7 +181,9 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// Handle Global Comment Deletion
+// ==========================================
+// HANDLE GLOBAL COMMENT DELETION
+// ==========================================
 document.addEventListener('click', async (e) => {
     if (e.target.classList.contains('delete-comment-btn')) {
         if (confirm("Delete this comment?")) {
@@ -258,7 +194,9 @@ document.addEventListener('click', async (e) => {
     }
 });
 
-// Render Reviews
+// ==========================================
+// RENDER REVIEWS AND COMMENTS
+// ==========================================
 const q = query(collection(db, "reviews"), orderBy("timestamp", "desc"));
 onSnapshot(q, (snapshot) => {
     reviewsContainer.innerHTML = '';
@@ -276,6 +214,7 @@ onSnapshot(q, (snapshot) => {
             <p>${data.review}</p>
         `;
 
+        // SHOW DELETE BUTTON IF: User owns the review OR User is Admin
         if (currentUser && (currentUser.uid === data.reviewerId || currentUser.email === ADMIN_EMAIL)) {
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
@@ -311,6 +250,7 @@ onSnapshot(q, (snapshot) => {
         card.appendChild(commentsDiv);
         reviewsContainer.appendChild(card);
 
+        // Fetch Comments for this review
         const commentsQuery = query(collection(db, "reviews", id, "comments"), orderBy("timestamp", "asc"));
         onSnapshot(commentsQuery, (commentSnap) => {
             const listElement = document.getElementById(`comments-list-${id}`);
@@ -325,6 +265,7 @@ onSnapshot(q, (snapshot) => {
             commentSnap.forEach((cDoc) => {
                 const cData = cDoc.data();
                 
+                // Show delete button for comments if author or Admin
                 let deleteHTML = '';
                 if (currentUser && (currentUser.uid === cData.authorId || currentUser.email === ADMIN_EMAIL)) {
                     deleteHTML = `<button class="delete-comment-btn" data-review-id="${id}" data-comment-id="${cDoc.id}" style="background: none; color: #ff5252; border: none; font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px; width: auto; font-weight: normal;">[Delete]</button>`;
