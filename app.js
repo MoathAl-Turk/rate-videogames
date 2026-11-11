@@ -38,18 +38,13 @@ const form = document.getElementById('review-form');
 const reviewsContainer = document.getElementById('reviews-container');
 
 let currentUser = null;
-let validGamesList = []; // Array to hold all 11,000+ games
+let validGamesList = []; 
 
-// ==========================================
-// FETCH DATASET AND POPULATE DATALIST
-// ==========================================
 fetch('games.json')
     .then(response => response.json())
     .then(games => {
         validGamesList = games;
         const datalist = document.getElementById('game-options');
-        
-        // Add each game as an option to the searchable dropdown
         games.forEach(game => {
             const option = document.createElement('option');
             option.value = game;
@@ -59,12 +54,18 @@ fetch('games.json')
     .catch(err => console.error("Error loading games.json:", err));
 
 
-// Routing logic
 function showView(viewId) {
     viewHome.style.display = 'none';
     viewRate.style.display = 'none';
     viewSettings.style.display = 'none';
-    document.getElementById(viewId).style.display = 'block';
+    
+    const activeView = document.getElementById(viewId);
+    activeView.style.display = 'block';
+    
+    // Retrigger the CSS fade-in animation
+    activeView.style.animation = 'none';
+    activeView.offsetHeight; 
+    activeView.style.animation = null;
 }
 
 goToRateBtn.addEventListener('click', () => showView('view-rate'));
@@ -73,7 +74,6 @@ navSettingsBtn.addEventListener('click', () => showView('view-settings'));
 settingsBackBtn.addEventListener('click', () => showView('view-home'));
 logo.addEventListener('click', () => showView('view-home'));
 
-// Theme Switcher Logic
 const themeButtons = document.querySelectorAll('.theme-btn');
 themeButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -82,14 +82,12 @@ themeButtons.forEach(btn => {
     });
 });
 
-// Auth State Changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
         loginBtnNav.style.display = 'none';
         userNameDisplay.style.display = 'inline';
         
-        // Admin crown check
         userNameDisplay.textContent = user.email === ADMIN_EMAIL ? `👑 ${user.displayName} (Admin)` : user.displayName;
         
         navSettingsBtn.style.display = 'inline-block';
@@ -107,9 +105,6 @@ onAuthStateChanged(auth, (user) => {
 loginBtnNav.addEventListener('click', () => signInWithPopup(auth, provider));
 logoutBtnSettings.addEventListener('click', () => signOut(auth));
 
-// ==========================================
-// SUBMIT REVIEW
-// ==========================================
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -117,7 +112,6 @@ form.addEventListener('submit', async (e) => {
     const gameNameInput = document.getElementById('game-name');
     const name = gameNameInput.value.trim();
     
-    // Strict Validation: Ensure the typed/selected name matches the games.json list
     if (!validGamesList.includes(name)) {
         alert("Please select a valid game from the dropdown list!");
         return;
@@ -151,9 +145,6 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
-// ==========================================
-// HANDLE COMMENT SUBMISSIONS
-// ==========================================
 document.addEventListener('submit', async (e) => {
     if (e.target.classList.contains('comment-form')) {
         e.preventDefault();
@@ -181,9 +172,6 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-// ==========================================
-// HANDLE GLOBAL COMMENT DELETION
-// ==========================================
 document.addEventListener('click', async (e) => {
     if (e.target.classList.contains('delete-comment-btn')) {
         if (confirm("Delete this comment?")) {
@@ -194,9 +182,6 @@ document.addEventListener('click', async (e) => {
     }
 });
 
-// ==========================================
-// RENDER REVIEWS AND COMMENTS
-// ==========================================
 const q = query(collection(db, "reviews"), orderBy("timestamp", "desc"));
 onSnapshot(q, (snapshot) => {
     reviewsContainer.innerHTML = '';
@@ -206,7 +191,7 @@ onSnapshot(q, (snapshot) => {
         const id = reviewDoc.id;
         
         const card = document.createElement('div');
-        card.className = 'review-card';
+        card.className = 'review-card glass-card';
         card.innerHTML = `
             <h3>${data.name}</h3>
             <div class="reviewer-name">Reviewed by: ${data.reviewerName}</div>
@@ -214,10 +199,10 @@ onSnapshot(q, (snapshot) => {
             <p>${data.review}</p>
         `;
 
-        // SHOW DELETE BUTTON IF: User owns the review OR User is Admin
         if (currentUser && (currentUser.uid === data.reviewerId || currentUser.email === ADMIN_EMAIL)) {
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
+            delBtn.style.marginTop = '20px';
             delBtn.textContent = currentUser.email === ADMIN_EMAIL && currentUser.uid !== data.reviewerId ? 'Admin: Delete Review' : 'Delete My Review';
             delBtn.onclick = async () => {
                 if(confirm("Are you sure you want to delete this review?")) {
@@ -235,11 +220,11 @@ onSnapshot(q, (snapshot) => {
             commentFormHTML = `
                 <form class="comment-form" data-review-id="${id}">
                     <input type="text" placeholder="Write a comment..." required>
-                    <button type="submit">Post</button>
+                    <button type="submit" class="glow-btn">Post</button>
                 </form>
             `;
         } else {
-            commentFormHTML = `<p style="font-size: 0.85rem; color: #888;">Log in to post a comment.</p>`;
+            commentFormHTML = `<p style="font-size: 0.85rem; color: #aaa;">Log in to post a comment.</p>`;
         }
         
         commentsDiv.innerHTML = `
@@ -250,7 +235,6 @@ onSnapshot(q, (snapshot) => {
         card.appendChild(commentsDiv);
         reviewsContainer.appendChild(card);
 
-        // Fetch Comments for this review
         const commentsQuery = query(collection(db, "reviews", id, "comments"), orderBy("timestamp", "asc"));
         onSnapshot(commentsQuery, (commentSnap) => {
             const listElement = document.getElementById(`comments-list-${id}`);
@@ -258,17 +242,16 @@ onSnapshot(q, (snapshot) => {
             
             listElement.innerHTML = '';
             if (commentSnap.empty) {
-                listElement.innerHTML = '<div style="font-size: 0.85rem; color: #888;">No comments yet.</div>';
+                listElement.innerHTML = '<div style="font-size: 0.85rem; color: #aaa;">No comments yet.</div>';
                 return;
             }
             
             commentSnap.forEach((cDoc) => {
                 const cData = cDoc.data();
                 
-                // Show delete button for comments if author or Admin
                 let deleteHTML = '';
                 if (currentUser && (currentUser.uid === cData.authorId || currentUser.email === ADMIN_EMAIL)) {
-                    deleteHTML = `<button class="delete-comment-btn" data-review-id="${id}" data-comment-id="${cDoc.id}" style="background: none; color: #ff5252; border: none; font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px; width: auto; font-weight: normal;">[Delete]</button>`;
+                    deleteHTML = `<button class="delete-comment-btn" data-review-id="${id}" data-comment-id="${cDoc.id}" style="background: none; color: #ff5252; border: none; font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px; width: auto; font-weight: normal; transition: text-shadow 0.2s;">[Delete]</button>`;
                 }
 
                 listElement.innerHTML += `
