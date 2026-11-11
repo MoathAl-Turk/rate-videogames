@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameRater</title>
+    <!-- Futuristic Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- Animated Rocket League 20XX Grid Background -->
+<div class="bg-grid" id="bg-grid"></div>
+
+<!-- Top Navigation Bar -->
 <nav class="navbar">
     <h2 id="logo">GameRater</h2>
     <div class="nav-right">
         <span id="user-name-display" style="display: none; margin-right: 15px; color: var(--primary); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;"></span>
-        <!-- New Admin Button -->
         <button id="nav-admin-btn" class="nav-btn" style="display: none; background: #ffd700; color: #000; box-shadow: 0 0 15px rgba(255,215,0,0.6); margin-right: 10px;">Admin</button>
         <button id="nav-settings-btn" class="nav-btn" style="display: none; margin-right: 10px;">Settings</button>
         <button id="login-btn-nav" class="nav-btn">Log In</button>
@@ -22,14 +26,17 @@
 
 <div class="container">
     
+    <!-- VIEW 1: Home / Feed -->
     <div id="view-home" class="view-section">
         <div class="form-card pulse-card" id="rate-prompt-card" style="display: none; text-align: center;">
             <h3 style="margin-top: 0;">Played a game recently?</h3>
             <button id="go-to-rate-btn" class="glow-btn">Rate a Game</button>
         </div>
+        
         <div id="reviews-container"></div>
     </div>
 
+    <!-- VIEW 2: Rate a Game Form -->
     <div id="view-rate" class="view-section" style="display: none;">
         <div class="form-card glass-card">
             <h2>Rate a Game</h2>
@@ -63,15 +70,26 @@
     <div id="view-settings" class="view-section" style="display: none;">
         <div class="form-card glass-card" style="text-align: center;">
             <h2 style="margin-top: 0;">Settings</h2>
+            
+            <!-- Accessibility Toggle -->
+            <h3 style="margin-top: 20px; color: var(--text);">Accessibility</h3>
+            <label class="checkbox-label" style="justify-content: center; margin-bottom: 30px;">
+                <input type="checkbox" id="toggle-motion" checked>
+                <span class="custom-checkbox"></span>
+                Enable Background Motion (20XX Grid)
+            </label>
+
             <h3 style="margin-top: 20px; color: var(--text);">UI Theme</h3>
             <div class="theme-buttons">
                 <button class="theme-btn secondary-btn" data-theme="default">Nebula Purple (Default)</button>
                 <button class="theme-btn secondary-btn" data-theme="green">Matrix Green</button>
                 <button class="theme-btn secondary-btn" data-theme="bw">Stealth Black</button>
             </div>
+
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <button id="logout-btn-settings" class="delete-btn" style="width: 100%;">Log Out</button>
             </div>
+
             <p class="credits" style="margin-top: 30px; font-weight: bold; color: var(--primary); letter-spacing: 2px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px var(--primary);">Made By Moath Al-Turk</p>
             <button type="button" id="settings-back-btn" class="secondary-btn" style="margin-top: 15px;">Back to Feed</button>
         </div>
@@ -83,9 +101,7 @@
             <h2 style="color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); margin-top: 0;">Admin Queue</h2>
             <p style="color: #aaa; margin-bottom: 20px;">Review submissions for games not in the verified dataset.</p>
             
-            <div id="pending-container">
-                <!-- Pending reviews will render here -->
-            </div>
+            <div id="pending-container"></div>
 
             <button type="button" id="admin-back-btn" class="secondary-btn" style="margin-top: 20px;">Back to Feed</button>
         </div>
